@@ -1,0 +1,18 @@
+diff -upr /home/xch/ZeroTierOne-1.6.6-fixed-windows-inf/make-linux.mk ZeroTierOne-1.6.6/make-linux.mk
+--- a/make-linux.mk	2021-09-23 23:02:38.000000000 +0000
++++ b/make-linux.mk	2022-02-09 03:17:43.842052087 +0000
+@@ -69,11 +69,11 @@ ifeq ($(ZT_DEBUG),1)
+ 	# C25519 in particular is almost UNUSABLE in -O0 even on a 3ghz box!
+ node/Salsa20.o node/SHA512.o node/C25519.o node/Poly1305.o: CXXFLAGS=-Wall -O2 -g -pthread $(INCLUDES) $(DEFS)
+ else
+-	CFLAGS?=-O3 -fstack-protector -fPIE
++	CFLAGS?=-O3 -fstack-protector
+ 	override CFLAGS+=-Wall -Wno-deprecated -pthread $(INCLUDES) -DNDEBUG $(DEFS)
+-	CXXFLAGS?=-O3 -fstack-protector -fPIE
++	CXXFLAGS?=-O3 -fstack-protector
+ 	override CXXFLAGS+=-Wall -Wno-deprecated -std=c++11 -pthread $(INCLUDES) -DNDEBUG $(DEFS)
+-	LDFLAGS=-pie -Wl,-z,relro,-z,now
++	LDFLAGS=-Wl,-z,relro,-z,now
+ 	STRIP?=strip
+ 	STRIP+=--strip-all
+ endif

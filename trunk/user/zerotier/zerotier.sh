@@ -33,13 +33,21 @@ start_instance() {
 
 	add_join $(nvram get zerotier_id)
 
+	ln -sf $config_path /var/lib/zerotier-one
+
 	$PROG $args $config_path >/dev/null 2>&1 &
 
 	rules
+
+	moon="$(nvram get zerotier_moon_id)"
+	if [ -n "$moon" ]; then
+		logger -t "zerotier" "设置MOON..."
+		$PROG -q orbit "$moon" "$moon"
+	fi
 }
 
 add_join() {
-		touch $config_path/networks.d/$1.conf
+	touch $config_path/networks.d/$1.conf
 }
 
 

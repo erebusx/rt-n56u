@@ -1,0 +1,48 @@
+--- a/make-linux.mk	2021-12-01 22:27:55.000000000 +0000
++++ b/make-linux.mk	2022-02-07 03:36:23.438890655 +0000
+@@ -68,11 +68,11 @@ ifeq ($(ZT_DEBUG),1)
+ 	# C25519 in particular is almost UNUSABLE in -O0 even on a 3ghz box!
+ node/Salsa20.o node/SHA512.o node/C25519.o node/Poly1305.o: CXXFLAGS=-Wall -O2 -g -pthread $(INCLUDES) $(DEFS)
+ else
+-	CFLAGS?=-O3 -fstack-protector -fPIE
++	CFLAGS?=-O3 -fstack-protector
+ 	override CFLAGS+=-Wall -Wno-deprecated -pthread $(INCLUDES) -DNDEBUG $(DEFS)
+-	CXXFLAGS?=-O3 -fstack-protector -fPIE
++	CXXFLAGS?=-O3 -fstack-protector
+ 	override CXXFLAGS+=-Wall -Wno-deprecated -std=c++11 -pthread $(INCLUDES) -DNDEBUG $(DEFS)
+-	LDFLAGS=-pie -Wl,-z,relro,-z,now
++	LDFLAGS=-Wl,-z,relro,-z,now
+ endif
+ 
+ ifeq ($(ZT_QNAP), 1)
+--- a/osdep/LinuxEthernetTap.cpp	2021-12-02 06:27:55.000000000 +0800
++++ b/osdep/LinuxEthernetTap.cpp	2022-02-09 18:20:24.507409171 +0800
+@@ -219,7 +219,7 @@ LinuxEthernetTap::LinuxEthernetTap(
+ 		ifr.ifr_flags |= IFF_UP;
+ 		if (ioctl(sock,SIOCSIFFLAGS,(void *)&ifr) < 0) {
+ 			::close(sock);
+-			printf("WARNING: ioctl() failed setting up Linux tap device (bring interface up)\n");
++			printf("WARNING: ioctl() failed setting up Linux tap device (bring interface up) 2\n");
+ 			return;
+ 		}
+ 
+@@ -228,15 +228,15 @@ LinuxEthernetTap::LinuxEthernetTap(
+ 		ifr.ifr_ifru.ifru_hwaddr.sa_family = ARPHRD_ETHER;
+ 		_mac.copyTo(ifr.ifr_ifru.ifru_hwaddr.sa_data,6);
+ 		if (ioctl(sock,SIOCSIFHWADDR,(void *)&ifr) < 0) {
+-			::close(sock);
+-			printf("WARNING: ioctl() failed setting up Linux tap device (set MAC)\n");
+-			return;
++//			::close(sock);
++			printf("WARNING: ioctl() failed setting up Linux tap device (set MAC) 2\n");
++//			return;
+ 		}
+ 
+ 		ifr.ifr_ifru.ifru_mtu = (int)_mtu;
+ 		if (ioctl(sock,SIOCSIFMTU,(void *)&ifr) < 0) {
+ 			::close(sock);
+-			printf("WARNING: ioctl() failed setting up Linux tap device (set MTU)\n");
++			printf("WARNING: ioctl() failed setting up Linux tap device (set MTU) 2\n");
+ 			return;
+ 		}
+ 
