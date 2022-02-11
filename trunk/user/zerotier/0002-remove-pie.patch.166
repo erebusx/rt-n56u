@@ -16,3 +16,62 @@ diff -upr /home/xch/ZeroTierOne-1.6.6-fixed-windows-inf/make-linux.mk ZeroTierOn
  	STRIP?=strip
  	STRIP+=--strip-all
  endif
+diff -upr /home/xch/ZeroTierOne-1.6.6-fixed-windows-inf/node/Utils.cpp ZeroTierOne-1.6.6/node/Utils.cpp
+--- a/node/Utils.cpp	2021-09-24 07:02:38.000000000 +0800
++++ b/node/Utils.cpp	2022-02-09 11:43:30.675603745 +0800
+@@ -29,7 +29,7 @@
+ #include <sys/uio.h>
+ #include <dirent.h>
+ #ifdef __LINUX__
+-#include <sys/auxv.h>
++//#include <sys/auxv.h>
+ #endif
+ #endif
+diff -upr /home/xch/ZeroTierOne-1.6.6-fixed-windows-inf/osdep/LinuxEthernetTap.cpp ZeroTierOne-1.6.6/osdep/LinuxEthernetTap.cpp
+--- a/osdep/LinuxEthernetTap.cpp	2021-09-24 07:02:38.000000000 +0800
++++ b/osdep/LinuxEthernetTap.cpp	2022-02-11 09:47:26.093261920 +0800
+@@ -207,18 +207,12 @@ LinuxEthernetTap::LinuxEthernetTap(
+ 					printf("WARNING: ioctl() failed setting up Linux tap device (bring interface up)\n");
+ 					return;
+ 				}
+-				ifr.ifr_flags |= IFF_UP;
+-				if (ioctl(sock,SIOCSIFFLAGS,(void *)&ifr) < 0) {
+-					::close(sock);
+-					printf("WARNING: ioctl() failed setting up Linux tap device (bring interface up)\n");
+-					return;
+-				}
+ 
+ 				// Some kernel versions seem to require you to yield while the device comes up
+ 				// before they will accept MTU and MAC. For others it doesn't matter, but is
+ 				// harmless. This was moved to the worker thread though so as not to block the
+ 				// main ZeroTier loop.
+-				usleep(500000);
++				//usleep(500000);
+ 
+ 				ifr.ifr_ifru.ifru_hwaddr.sa_family = ARPHRD_ETHER;
+ 				_mac.copyTo(ifr.ifr_ifru.ifru_hwaddr.sa_data,6);
+@@ -228,6 +222,16 @@ LinuxEthernetTap::LinuxEthernetTap(
+ 					return;
+ 				}
+ 
++				usleep(100000);
++				ifr.ifr_flags |= IFF_MULTICAST;
++				ifr.ifr_flags |= IFF_UP;
++				if (ioctl(sock,SIOCSIFFLAGS,(void *)&ifr) < 0) {
++					::close(sock);
++					printf("WARNING: ioctl() failed setting up Linux tap device (bring interface up) 2\n");
++					return;
++				}
++				usleep(100000);
++
+ 				ifr.ifr_ifru.ifru_mtu = (int)_mtu;
+ 				if (ioctl(sock,SIOCSIFMTU,(void *)&ifr) < 0) {
+ 					::close(sock);
+@@ -235,6 +239,7 @@ LinuxEthernetTap::LinuxEthernetTap(
+ 					return;
+ 				}
+ 
++
+ 				fcntl(_fd,F_SETFL,O_NONBLOCK);
+ 
+ 				::close(sock);

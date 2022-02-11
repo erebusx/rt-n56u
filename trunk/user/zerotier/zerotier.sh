@@ -33,7 +33,10 @@ start_instance() {
 
 	add_join $(nvram get zerotier_id)
 
-	ln -sf $config_path /var/lib/zerotier-one
+	cpath="/var/lib/zerotier-one"
+	if [ ! -e "$cpath" ]; then
+		ln -sf $config_path $cpath
+	fi
 
 	$PROG $args $config_path >/dev/null 2>&1 &
 
